@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import IosInstallDialog from '@/components/IosInstallDialog.vue';
+import IosInstallDialog from '@/views/dialogs/IosInstallDialog.vue';
 import { usePwaInstall } from '@/composables/usePwaInstall';
 import { useAuthStore } from '@/stores/auth';
 
@@ -24,6 +24,18 @@ const appVersion = __APP_VERSION__;
 const onInstallClick = async (): Promise<void> => {
   const outcome = await promptInstall();
   if (outcome === 'ios-instructions') showIosInstall.value = true;
+};
+
+const noticeMessage = computed<string | null>(() => {
+  if (route.query.notice === 'password-changed') {
+    return 'Password changed. Please sign in with your new password.';
+  }
+  return null;
+});
+
+const onDismissNotice = async (): Promise<void> => {
+  const { notice: _omit, ...rest } = route.query;
+  await router.replace({ path: route.path, query: rest });
 };
 
 const usernameRules = [
@@ -63,6 +75,17 @@ const onDismissError = (): void => {
           <h1 class="text-h5 font-weight-bold">Sign in</h1>
           <p class="text-body-2 text-medium-emphasis mt-1">Enter your credentials to continue.</p>
         </div>
+
+        <v-alert
+          v-if="noticeMessage"
+          type="success"
+          variant="tonal"
+          class="mb-4"
+          closable
+          @click:close="onDismissNotice"
+        >
+          {{ noticeMessage }}
+        </v-alert>
 
         <v-alert
           v-if="auth.error"

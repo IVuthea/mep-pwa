@@ -33,9 +33,14 @@ onMounted(async () => {
   await Promise.all([minDelay, validate]);
 
   const currentName = router.currentRoute.value.name;
+  const redirect = router.currentRoute.value.query.redirect as string | undefined;
   if (auth.isAuthenticated) {
     if (currentName === 'login') {
-      await router.replace({ name: 'projects' });
+      if (redirect == null) {
+        await router.replace({ name: 'projects' });
+      } else {
+        await router.replace(redirect);
+      }
     }
   } else if (currentName !== 'login') {
     await router.replace({ name: 'login' });

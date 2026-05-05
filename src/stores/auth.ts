@@ -125,6 +125,29 @@ export const useAuthStore = defineStore('auth', () => {
     await clearStoredAuth();
   }
 
+  async function changePassword(
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<{ success: boolean; message?: string }> {
+    try {
+      await http.post('/auth/change-password', {
+        old_password: oldPassword,
+        new_password: newPassword,
+      });
+      return { success: true };
+    } catch (e) {
+      let message = 'Failed to change password. Please try again.';
+      if (isNormalizedError(e)) {
+        message = e.isOffline
+          ? 'You are offline. Connect to the internet and try again.'
+          : e.message;
+      } else if (e instanceof Error) {
+        message = e.message;
+      }
+      return { success: false, message };
+    }
+  }
+
   function clearError(): void {
     error.value = null;
   }
@@ -139,6 +162,7 @@ export const useAuthStore = defineStore('auth', () => {
     fetchCurrentUser,
     login,
     logout,
+    changePassword,
     clearError,
   };
 });

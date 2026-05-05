@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { useDisplay, useTheme } from 'vuetify';
 import { useRoute, useRouter } from 'vue-router';
-import IosInstallDialog from '@/components/IosInstallDialog.vue';
+import IosInstallDialog from '@/views/dialogs/IosInstallDialog.vue';
 import { useOnline } from '@/composables/useOnline';
 import { usePwaInstall } from '@/composables/usePwaInstall';
 import { useAuthStore } from '@/stores/auth';

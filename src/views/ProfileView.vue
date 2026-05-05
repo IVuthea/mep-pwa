@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useProfileStore } from '@/stores/profile';
 import { useAuthStore } from '@/stores/auth';
 import PullToRefresh from '@/components/PullToRefresh.vue';
+import ChangePasswordDialog from '@/views/dialogs/ChangePasswordDialog.vue';
 
 const profile = useProfileStore();
 const auth = useAuthStore();
@@ -11,6 +12,14 @@ const router = useRouter();
 
 const employee = computed(() => profile.employee);
 const appVersion = __APP_VERSION__;
+
+const passwordDialogOpen = ref(false);
+
+const onPasswordChanged = async (): Promise<void> => {
+  await auth.logout();
+  profile.reset();
+  await router.replace({ name: 'login', query: { notice: 'password-changed' } });
+};
 
 const initial = computed(() => {
   const name = employee.value?.name ?? '';
@@ -175,11 +184,23 @@ onMounted(() => {
           </v-card>
 
           <v-btn
-            color="error"
+            color="primary"
             variant="tonal"
             size="large"
             block
             class="mt-4"
+            prepend-icon="mdi-lock-reset"
+            @click="passwordDialogOpen = true"
+          >
+            Change password
+          </v-btn>
+
+          <v-btn
+            color="error"
+            variant="tonal"
+            size="large"
+            block
+            class="mt-3"
             prepend-icon="mdi-logout"
             @click="onLogout"
           >
@@ -199,6 +220,8 @@ onMounted(() => {
       </PullToRefresh>
     </v-col>
   </v-row>
+
+  <ChangePasswordDialog v-model="passwordDialogOpen" @success="onPasswordChanged" />
 </template>
 
 <style scoped>

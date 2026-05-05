@@ -28,7 +28,7 @@ export const useProjectsStore = defineStore('projects', () => {
     isOffline.value = false;
     try {
       const res = await http.get('/project');
-      const list = (res?.data?.data?.projects?.data ?? []) as ProjectModel[];
+      const list = (res?.data?.data ?? []) as ProjectModel[];
       projects.value = Array.isArray(list) ? list : [];
       return true;
     } catch (e) {
