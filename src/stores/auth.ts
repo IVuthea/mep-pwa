@@ -75,6 +75,12 @@ export const useAuthStore = defineStore('auth', () => {
       if (isNormalizedError(e) && e.status === 401) {
         await logout();
       }
+
+      let errorMessage = JSON.stringify(e);
+      if (errorMessage.includes("Unauthenticated")) {
+        await logout();
+      }
+
       return false;
     }
   }
