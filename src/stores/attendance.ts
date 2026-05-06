@@ -232,6 +232,11 @@ export const useAttendanceStore = defineStore('attendance', () => {
             time,
           });
           successCount++;
+          // Server accepted the scan — drop it from storage and the reactive
+          // list so the visible list shrinks to just retry-able failures and
+          // a re-run of the batch can't double-submit an already-accepted row.
+          await deleteAttendanceScan(id);
+          scans.value = scans.value.filter((s) => s.id !== id);
         } catch (e) {
           try {
             console.error('submitAllScans: scan failed', { id, error: e });
